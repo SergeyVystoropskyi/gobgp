@@ -832,13 +832,35 @@ func NewCapLongLivedGracefulRestartTuple(rf RouteFamily, forward bool, restartTi
 
 type CapSecureBGPTuple struct {
 	AFI         uint16
-	Flags       uint8
+	Version       uint8
 	Direction   uint8
 }
 
 type CapSecureBGP struct {
 	DefaultParameterCapability
 	Tuples []* CapSecureBGPTuple
+}
+
+func (c *CapSecureBGP) DecodeFromBytes(data []byte) error {
+	c.DefaultParameterCapability.DecodeFromBytes(data)
+	data = data[2:]
+	if len(data) % 3 != 0 {
+		return NewMessageError(BGP_ERROR_OPEN_MESSAGE_ERROR, BGP_ERROR_SUB_UNSUPPORTED_CAPABILITY, nil, "Not all CapabilitySecureBGP bytes available")
+	}
+	c.Tuples = make([]*CapSecureBGPTuple, 0, len(data)/3)
+
+	for len(data) >= 3 {
+		current := data[:3]
+		data = data[3:]
+
+		tmp := CapSecureBGPTuple{}
+		tmp.Version = uint8(current[0] & 0x0f)
+		tmp.Direction = uint8(current[0] & 0x10)
+		tmp.AFI = binary.BigEndian.Uint16(current[1:3])
+		c.Tuples = append(c.Tuples, &tmp)
+	}
+
+	return nil
 }
 
 type CapLongLivedGracefulRestart struct {
