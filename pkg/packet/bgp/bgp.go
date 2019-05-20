@@ -8667,6 +8667,34 @@ func AsPathString(aspath *PathAttributeAsPath) string {
 	return s.String()
 }
 
+type SecurePathSignatureSegment struct {
+	SKI [5]uint8
+	length uint16
+	signature []uint8
+}
+
+type SecurePathSignature struct {
+	length  uint16
+	suiteID uint8
+	segments []SecurePathSignatureSegment
+}
+
+type SecurePathSegment struct {
+	pCount   uint8
+	flags    uint8
+	ASNumber uint32
+}
+
+type SecurePath struct {
+	length uint16
+	segments []*SecurePathSegment
+}
+
+type BGPSecAsPath struct {
+	path SecurePath
+	signatures []*SecurePathSignature
+}
+
 type AsPathParam struct {
 	Type uint8
 	Num  uint8
