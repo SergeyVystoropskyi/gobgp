@@ -261,6 +261,7 @@ const (
 	BGP_CAP_ROUTE_REFRESH               BGPCapabilityCode = 2
 	BGP_CAP_CARRYING_LABEL_INFO         BGPCapabilityCode = 4
 	BGP_CAP_EXTENDED_NEXTHOP            BGPCapabilityCode = 5
+	BGP_CAP_SECURE_BGP                  BGPCapabilityCode = 7
 	BGP_CAP_GRACEFUL_RESTART            BGPCapabilityCode = 64
 	BGP_CAP_FOUR_OCTET_AS_NUMBER        BGPCapabilityCode = 65
 	BGP_CAP_ADD_PATH                    BGPCapabilityCode = 69
@@ -280,6 +281,7 @@ var CapNameMap = map[BGPCapabilityCode]string{
 	BGP_CAP_ENHANCED_ROUTE_REFRESH:      "enhanced-route-refresh",
 	BGP_CAP_ROUTE_REFRESH_CISCO:         "cisco-route-refresh",
 	BGP_CAP_LONG_LIVED_GRACEFUL_RESTART: "long-lived-graceful-restart",
+	BGP_CAP_SECURE_BGP:                  "secure-bgp",
 }
 
 func (c BGPCapabilityCode) String() string {
@@ -828,6 +830,17 @@ func NewCapLongLivedGracefulRestartTuple(rf RouteFamily, forward bool, restartTi
 	}
 }
 
+type CapSecureBGPTuple struct {
+	AFI         uint16
+	Flags       uint8
+	Direction   uint8
+}
+
+type CapSecureBGP struct {
+	DefaultParameterCapability
+	Tuples []* CapSecureBGPTuple
+}
+
 type CapLongLivedGracefulRestart struct {
 	DefaultParameterCapability
 	Tuples []*CapLongLivedGracefulRestartTuple
@@ -926,6 +939,8 @@ func DecodeCapability(data []byte) (ParameterCapabilityInterface, error) {
 		c = &CapRouteRefreshCisco{}
 	case BGP_CAP_LONG_LIVED_GRACEFUL_RESTART:
 		c = &CapLongLivedGracefulRestart{}
+	case BGP_CAP_SECURE_BGP:
+		c = &CapSecureBGP{}
 	default:
 		c = &CapUnknown{}
 	}
