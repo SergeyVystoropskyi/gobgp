@@ -778,6 +778,9 @@ func capabilitiesFromConfig(pConf *config.Neighbor) []bgp.ParameterCapabilityInt
 		caps = append(caps, capAddPathFromConfig(pConf))
 	}
 
+	// secure bgp
+	caps = append(caps, bgp.NewCapSecureBGP(true, true))
+
 	return caps
 }
 

@@ -841,6 +841,51 @@ type CapSecureBGP struct {
 	Tuples []* CapSecureBGPTuple
 }
 
+func NewCapSecureBGPTulpe(rf RouteFamily, version uint8, direction uint8) *CapSecureBGPTuple {
+	afi, _ := RouteFamilyToAfiSafi(rf)
+	return &CapSecureBGPTuple{
+		AFI: afi,
+		Version: version,
+		Direction: direction,
+	}
+}
+
+func NewCapSecureBGP(send, recv bool) *CapSecureBGP {
+	tuples := make([]*CapSecureBGPTuple, 0, 0)
+	if send {
+		tuples = append(tuples, NewCapSecureBGPTulpe(RF_IPv4_UC, 0, 0))
+	}
+	if recv {
+		tuples = append(tuples, NewCapSecureBGPTulpe(RF_IPv4_UC, 0, 1))
+	}
+
+	return &CapSecureBGP{
+		DefaultParameterCapability{
+			CapCode: BGP_CAP_SECURE_BGP,
+		},
+		tuples,
+	}
+}
+
+func (c *CapSecureBGP) Serialize() ([]byte, error) {
+	buf := make([]byte, 3*len(c.Tuples))
+
+	for idx, t := range c.Tuples {
+		fst := uint8(0)
+		if t.Direction == 1 {
+			fst = 16
+		} else {
+			fst = 0
+		}
+		fst = fst & (t.Version & uint8(0x0f))
+		buf[idx*3] = fst
+		binary.BigEndian.PutUint16(buf[idx*3+1:], t.AFI)
+	}
+
+	c.DefaultParameterCapability.CapValue = buf
+	return c.DefaultParameterCapability.Serialize()
+}
+
 func (c *CapSecureBGP) DecodeFromBytes(data []byte) error {
 	c.DefaultParameterCapability.DecodeFromBytes(data)
 	data = data[2:]
