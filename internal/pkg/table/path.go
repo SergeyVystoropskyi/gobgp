@@ -587,6 +587,14 @@ func (path *Path) getPrefix() string {
 	return path.GetNlri().String()
 }
 
+func (path *Path) GetSecureASPath() *bgp.BGPSecAsPath {
+	attr := path.getPathAttr(bgp.BGP_ATTR_TYPE_SECURE_AS_PATH)
+    if attr != nil {
+        return attr.(*bgp.BGPSecAsPath)
+    }
+    return nil
+}
+
 func (path *Path) GetAsPath() *bgp.PathAttributeAsPath {
 	attr := path.getPathAttr(bgp.BGP_ATTR_TYPE_AS_PATH)
 	if attr != nil {

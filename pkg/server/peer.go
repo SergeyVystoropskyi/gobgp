@@ -493,7 +493,15 @@ func (peer *peer) handleUpdate(e *fsmMsg) ([]*table.Path, []bgp.RouteFamily, *bg
 			//
 			// If the AS_PATH attribute of a BGP route contains an AS loop, the BGP
 			// route should be excluded from the Phase 2 decision function.
-			if aspath := path.GetAsPath(); aspath != nil {
+			//
+			aspath := nil
+			if peer.isSecureBGPEnabled() {
+				aspath = path.GetSecureASPath()
+			} else {
+				aspath = path.GetAsPath();
+			}
+
+			if  aspath != nil {
 				peer.fsm.lock.RLock()
 				localAS := peer.fsm.peerInfo.LocalAS
 				allowOwnAS := int(peer.fsm.pConf.AsPathOptions.Config.AllowOwnAs)
