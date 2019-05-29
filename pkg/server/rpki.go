@@ -16,6 +16,7 @@
 package server
 
 import (
+	"crypto/x509"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -93,17 +94,25 @@ type roaEvent struct {
 	conn      *net.TCPConn
 }
 
+type SKICert struct {
+	ASList []uint32
+	cert *x509.Certificate
+}
+
 type roaManager struct {
 	AS        uint32
 	Roas      map[bgp.RouteFamily]*radix.Tree
+
 	eventCh   chan *roaEvent
 	clientMap map[string]*roaClient
+	SKIMap  map[[20]byte]*SKICert
 }
 
 func newROAManager(as uint32) (*roaManager, error) {
 	m := &roaManager{
 		AS:   as,
 		Roas: make(map[bgp.RouteFamily]*radix.Tree),
+		SKIMap : make(map[[20]byte]*SKICert),
 	}
 	m.Roas[bgp.RF_IPv4_UC] = radix.New()
 	m.Roas[bgp.RF_IPv6_UC] = radix.New()
@@ -265,6 +274,9 @@ func (m *roaManager) HandleROAEvent(ev *roaEvent) {
 		} else {
 			log.WithFields(log.Fields{"Topic": "rpki"}).Infof("Deleting all ROAs due to timeout with:%s", client.host)
 			m.deleteAllROA(client.host)
+			for k := range m.SKIMap {
+				delete(m.SKIMap, k)
+			}
 		}
 	}
 }

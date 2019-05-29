@@ -8714,7 +8714,7 @@ func AsPathString(aspath *PathAttributeAsPath) string {
 }
 
 type SecurePathSignatureSegment struct {
-	SKI [5]uint8
+	SKI [20]uint8
 	length uint16
 	signature []uint8
 }
