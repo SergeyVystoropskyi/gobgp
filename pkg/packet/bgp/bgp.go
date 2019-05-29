@@ -8737,8 +8737,14 @@ type SecurePath struct {
 }
 
 type BGPSecAsPath struct {
+	PathAttributeInterface
 	path SecurePath
 	signatures []*SecurePathSignature
+}
+
+func (a *BGPSecAsPath)DecodeFromBytes(data []byte, options ...*MarshallingOption) error {
+	//TODO: implement
+	return nil
 }
 
 type AsPathParam struct {
