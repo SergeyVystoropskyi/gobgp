@@ -8742,6 +8742,44 @@ type BGPSecAsPath struct {
 	signatures []*SecurePathSignature
 }
 
+func (a *BGPSecAsPath) Serialize(...*MarshallingOption) ([]byte, error) {
+	//TODO: implement
+	return nil, nil
+}
+
+func (a *BGPSecAsPath) Len(...*MarshallingOption) int {
+	res := int(a.path.length) * 6
+	for i:=0; i < len(a.signatures); i++ {
+		res = res + int(a.signatures[i].length)
+	}
+	return res
+}
+
+func (a *BGPSecAsPath) GetFlags() BGPAttrFlag {
+	//TODO: implement
+	return BGP_ATTR_FLAG_OPTIONAL
+}
+
+func (a *BGPSecAsPath) GetType() BGPAttrType {
+	//TODO: implement
+	return BGP_ATTR_TYPE_SECURE_AS_PATH
+}
+
+func (a *BGPSecAsPath) String() string {
+	//TODO: implement
+	return "BGPsec AS Path"
+}
+
+func (a *BGPSecAsPath) MarshalJSON() ([]byte, error) {
+	//TODO: implement
+	return nil, nil
+}
+
+func (a *BGPSecAsPath) Flat() map[string]string {
+	//TODO: implement
+	return nil
+}
+
 func (a *BGPSecAsPath)DecodeFromBytes(data []byte, options ...*MarshallingOption) error {
 	//TODO: implement
 	return nil
