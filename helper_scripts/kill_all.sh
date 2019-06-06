@@ -2,5 +2,5 @@
 
 for i in $(pgrep bgpd); 
 do
-kill -9 $i;
+sudo kill -9 $i;
 done
