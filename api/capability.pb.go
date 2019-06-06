@@ -296,6 +296,14 @@ func (m *RouteRefreshCiscoCapability) String() string            { return proto.
 func (*RouteRefreshCiscoCapability) ProtoMessage()               {}
 func (*RouteRefreshCiscoCapability) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{13} }
 
+type BGPSecCapability struct {
+}
+
+func (m *BGPSecCapability) Reset()                    { *m = BGPSecCapability{} }
+func (m *BGPSecCapability) String() string            { return "blah" }
+func (*BGPSecCapability) ProtoMessage()               {}
+func (*BGPSecCapability) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{15} } // TODO: fix to 14
+
 type UnknownCapability struct {
 	Code  uint32 `protobuf:"varint,1,opt,name=code" json:"code,omitempty"`
 	Value []byte `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
@@ -304,7 +312,7 @@ type UnknownCapability struct {
 func (m *UnknownCapability) Reset()                    { *m = UnknownCapability{} }
 func (m *UnknownCapability) String() string            { return proto.CompactTextString(m) }
 func (*UnknownCapability) ProtoMessage()               {}
-func (*UnknownCapability) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{14} }
+func (*UnknownCapability) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{14} } //TODO: fix to 15
 
 func (m *UnknownCapability) GetCode() uint32 {
 	if m != nil {
@@ -335,6 +343,7 @@ func init() {
 	proto.RegisterType((*LongLivedGracefulRestartCapabilityTuple)(nil), "gobgpapi.LongLivedGracefulRestartCapabilityTuple")
 	proto.RegisterType((*LongLivedGracefulRestartCapability)(nil), "gobgpapi.LongLivedGracefulRestartCapability")
 	proto.RegisterType((*RouteRefreshCiscoCapability)(nil), "gobgpapi.RouteRefreshCiscoCapability")
+	proto.RegisterType((*BGPSecCapability)(nil), "gobgpapi.BGPSecCapability")
 	proto.RegisterType((*UnknownCapability)(nil), "gobgpapi.UnknownCapability")
 	proto.RegisterEnum("gobgpapi.AddPathMode", AddPathMode_name, AddPathMode_value)
 }

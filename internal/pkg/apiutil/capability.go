@@ -110,6 +110,10 @@ func NewRouteRefreshCiscoCapability(a *bgp.CapRouteRefreshCisco) *api.RouteRefre
 	return &api.RouteRefreshCiscoCapability{}
 }
 
+func NewCapSecureBGP(a *bgp.CapSecureBGP) *api.BGPSecCapability {
+	return &api.BGPSecCapability{}
+}
+
 func NewUnknownCapability(a *bgp.CapUnknown) *api.UnknownCapability {
 	return &api.UnknownCapability{
 		Code:  uint32(a.CapCode),
@@ -140,6 +144,8 @@ func MarshalCapability(value bgp.ParameterCapabilityInterface) (*any.Any, error)
 		m = NewLongLivedGracefulRestartCapability(n)
 	case *bgp.CapRouteRefreshCisco:
 		m = NewRouteRefreshCiscoCapability(n)
+	case *bgp.CapSecureBGP:
+		m = NewCapSecureBGP(n)
 	case *bgp.CapUnknown:
 		m = NewUnknownCapability(n)
 	default:
