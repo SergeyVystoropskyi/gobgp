@@ -494,23 +494,23 @@ func (peer *peer) handleUpdate(e *fsmMsg) ([]*table.Path, []bgp.RouteFamily, *bg
 			// If the AS_PATH attribute of a BGP route contains an AS loop, the BGP
 			// route should be excluded from the Phase 2 decision function.
 			//
-			aspath := nil
-			if peer.isSecureBGPEnabled() {
-				aspath = path.GetSecureASPath()
-			} else {
-				aspath = path.GetAsPath();
-			}
+			//var aspath bgp.PathAttributeInterface
+			//if peer.isSecureBGPEnabled() {
+			//	aspath = path.GetSecureASPath()
+			//} else {
+			//	aspath = path.GetAsPath();
+			//}
 
-			if  aspath != nil {
-				peer.fsm.lock.RLock()
-				localAS := peer.fsm.peerInfo.LocalAS
-				allowOwnAS := int(peer.fsm.pConf.AsPathOptions.Config.AllowOwnAs)
-				peer.fsm.lock.RUnlock()
-				if hasOwnASLoop(localAS, allowOwnAS, aspath) {
-					path.SetAsLooped(true)
-					continue
-				}
-			}
+			//if  aspath != nil {
+			//	peer.fsm.lock.RLock()
+			//	localAS := peer.fsm.peerInfo.LocalAS
+			//	allowOwnAS := int(peer.fsm.pConf.AsPathOptions.Config.AllowOwnAs)
+			//	peer.fsm.lock.RUnlock()
+			//	if hasOwnASLoop(localAS, allowOwnAS, aspath) {
+			//		path.SetAsLooped(true)
+			//		continue
+			//	}
+			//}
 			// RFC4456 8. Avoiding Routing Information Loops
 			// A router that recognizes the ORIGINATOR_ID attribute SHOULD
 			// ignore a route received with its BGP Identifier as the ORIGINATOR_ID.

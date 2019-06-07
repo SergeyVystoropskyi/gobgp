@@ -8737,7 +8737,7 @@ type SecurePath struct {
 }
 
 type BGPSecAsPath struct {
-	PathAttributeInterface
+	PathAttributeAsPath
 	path SecurePath
 	signatures []*SecurePathSignature
 }
