@@ -8715,31 +8715,31 @@ func AsPathString(aspath *PathAttributeAsPath) string {
 
 type SecurePathSignatureSegment struct {
 	SKI [20]uint8
-	length uint16
-	signature []uint8
+	Length uint16
+	Signature []uint8
 }
 
 type SecurePathSignature struct {
-	length  uint16
-	suiteID uint8
-	segments []SecurePathSignatureSegment
+	Length  uint16
+	SuiteID uint8
+	Segments []SecurePathSignatureSegment
 }
 
 type SecurePathSegment struct {
-	pCount   uint8
-	flags    uint8
+	PCount   uint8
+	Flags    uint8
 	ASNumber uint32
 }
 
 type SecurePath struct {
-	length uint16
-	segments []*SecurePathSegment
+	Length uint16
+	Segments []*SecurePathSegment
 }
 
 type BGPSecAsPath struct {
 	PathAttributeAsPath
-	path SecurePath
-	signatures []*SecurePathSignature
+	Path SecurePath
+	Signatures []*SecurePathSignature
 }
 
 func (a *BGPSecAsPath) Serialize(...*MarshallingOption) ([]byte, error) {
@@ -8748,9 +8748,9 @@ func (a *BGPSecAsPath) Serialize(...*MarshallingOption) ([]byte, error) {
 }
 
 func (a *BGPSecAsPath) Len(...*MarshallingOption) int {
-	res := int(a.path.length) * 6
-	for i:=0; i < len(a.signatures); i++ {
-		res = res + int(a.signatures[i].length)
+	res := int(a.Path.Length) * 6
+	for i:=0; i < len(a.Signatures); i++ {
+		res = res + int(a.Signatures[i].Length)
 	}
 	return res
 }

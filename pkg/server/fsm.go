@@ -829,6 +829,19 @@ func hasOwnASLoop(ownAS uint32, limit int, asPath *bgp.PathAttributeAsPath) bool
 	return false
 }
 
+func hasOwnASLoopSec(ownAS uint32, limit int, asPath *bgp.BGPSecAsPath) bool {
+	cnt := 0
+	for _, seg := range asPath.Path.Segments {
+		if seg.ASNumber == ownAS {
+			cnt++
+			if cnt > limit {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func extractRouteFamily(p *bgp.PathAttributeInterface) *bgp.RouteFamily {
 	attr := *p
 
