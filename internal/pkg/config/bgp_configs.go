@@ -3251,6 +3251,8 @@ type Neighbor struct {
 	// original -> bgp:graceful-restart
 	// Parameters relating the graceful restart mechanism for BGP.
 	GracefulRestart GracefulRestart `mapstructure:"graceful-restart" json:"graceful-restart,omitempty"`
+	//TODO: Placeholder for BGPSec
+	BGPSec BGPSec `mapstructure:"graceful-restart" json:"graceful-restart,omitempty"`
 	// original -> rpol:apply-policy
 	// Anchor point for routing policies in the model.
 	// Import and export policies are with respect to the local
@@ -3329,6 +3331,9 @@ func (lhs *Neighbor) Equal(rhs *Neighbor) bool {
 		return false
 	}
 	if !lhs.TtlSecurity.Equal(&(rhs.TtlSecurity)) {
+		return false
+	}
+	if !lhs.BGPSec.Equal(&(rhs.BGPSec)) {
 		return false
 	}
 	return true
@@ -4170,6 +4175,18 @@ func (lhs *AfiSafi) Equal(rhs *AfiSafi) bool {
 	return true
 }
 
+type BGPSecState struct {
+	Enabled bool `mapstructure:"enabled" json:"enabled,omitempty"`
+}
+
+func (lhs *BGPSecState) Equal(rhs *BGPSecState) bool {
+	if lhs == nil || rhs == nil {
+		return false
+	}
+	return lhs.Enabled == rhs.Enabled
+}
+
+
 // struct for container bgp:state.
 // State information associated with graceful-restart.
 type GracefulRestartState struct {
@@ -4301,6 +4318,21 @@ func (lhs *GracefulRestartConfig) Equal(rhs *GracefulRestartConfig) bool {
 	}
 	return true
 }
+
+type BGPSec struct {
+	State BGPSecState `mapstructure:"state" json:"state,omitempty"`
+}
+
+func (lhs *BGPSec) Equal(rhs *BGPSec) bool {
+	if lhs == nil || rhs == nil {
+		return false
+	}
+	if !lhs.State.Equal(&(rhs.State)) {
+		return false
+	}
+	return true
+}
+
 
 // struct for container bgp:graceful-restart.
 // Parameters relating the graceful restart mechanism for BGP.

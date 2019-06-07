@@ -168,7 +168,7 @@ func (peer *peer) isGracefulRestartEnabled() bool {
 func (peer *peer) isSecureBGPEnabled() bool {
 	peer.fsm.lock.RLock()
 	defer peer.fsm.lock.RUnlock()
-	return peer.fsm.pConf.SecureBGP.State.Enabled
+	return peer.fsm.pConf.BGPSec.State.Enabled
 }
 
 func (peer *peer) getAddPathMode(family bgp.RouteFamily) bgp.BGPAddPathMode {
