@@ -347,6 +347,36 @@ func (m *roaManager) AddROA(roa *table.ROA) {
 	m.addROA(roa)
 }
 
+func (m *roaManager) addSKI(skiMsg *rtr.RTRRouterKey) (error) {
+	ski := skiMsg.SKI
+	asn := skiMsg.ASNumber
+	spki := skiMsg.SPKI
+
+	certificate, err := x509.ParseCertificate(spki)
+	if err != nil {
+		return err
+	}
+
+	// TODO: add couple of checks for duplicate PDUs
+	// and handle duplicate cert and same ski hashes for different certs
+	// check rfc: https://tools.ietf.org/html/rfc8210#section-5.10
+	// This is very confusing since gortr and librtr have different implementation
+	// check this: https://github.com/cloudflare/gortr/blob/master/lib/structs.go
+	// https://github.com/rtrlib/rtrlib/blob/master/rtrlib/spki/spkitable.h
+	if skiEntry, ok := m.SKIMap[ski]; !ok {
+		aslist := make([]uint32, 0)
+		aslist = append(aslist, asn)
+		m.SKIMap[ski] = &SKICert{
+			ASList: aslist,
+			cert:   certificate,
+		}
+	} else {
+		skiEntry.ASList = append(skiEntry.ASList, asn)
+	}
+
+	return nil
+}
+
 func (m *roaManager) handleRTRMsg(client *roaClient, state *config.RpkiServerState, buf []byte) {
 	received := &state.RpkiMessages.RpkiReceived
 
@@ -409,6 +439,8 @@ func (m *roaManager) handleRTRMsg(client *roaClient, state *config.RpkiServerSta
 			received.CacheReset++
 		case *rtr.RTRErrorReport:
 			received.Error++
+		case *rtr.RTRRouterKey:
+			m.addSKI(msg)
 		}
 	} else {
 		log.WithFields(log.Fields{

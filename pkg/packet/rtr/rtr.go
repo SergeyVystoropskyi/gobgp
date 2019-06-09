@@ -69,6 +69,18 @@ const (
 	DUPLICATE_ANNOUNCEMENT_RECORD
 )
 
+// *****************************************************
+// BGPSec: https://tools.ietf.org/html/rfc8210#section-8
+const (
+	RTR_ROUTER_KEY = 9
+)
+
+const (
+	UNEXPECTED_PROTOCOL_VERSION = 8
+)
+// BGPSec: https://tools.ietf.org/html/rfc8210#section-8
+// *****************************************************
+
 type RTRMessage interface {
 	DecodeFromBytes([]byte) error
 	Serialize() ([]byte, error)
@@ -348,6 +360,42 @@ func NewRTRErrorReport(errCode uint16, errPDU []byte, errMsg []byte) *RTRErrorRe
 	return pdu
 }
 
+type RTRRouterKey struct {
+	Version   uint8
+	Type      uint8
+	Flags	  uint8
+	Len    	  uint32
+	SKI       [20]byte
+	ASNumber  uint32
+	SPKI      []byte // https://tools.ietf.org/html/rfc8208#page-5 this is x509 cert
+	// https://tools.ietf.org/html/rfc5280 and https://tools.ietf.org/html/rfc8210#section-5.10
+}
+
+func (m *RTRRouterKey) DecodeFromBytes(data []byte) error {
+	m.Version = data[0]
+	m.Type = data[1]
+	m.Flags = data[2]
+	m.Len = binary.BigEndian.Uint32(data[4:8])
+	copy(m.SKI[:], data[8:28])
+	m.ASNumber = binary.BigEndian.Uint32(data[28:32])
+	spkiLen := len(data[32:])
+	m.SPKI = make([]byte, spkiLen)
+	copy(m.SPKI, data[32:])
+	return nil
+}
+
+func (m *RTRRouterKey) Serialize() ([]byte, error) {
+	data := make([]byte, m.Len)
+	data[0] = m.Version
+	data[1] = m.Type
+	data[2] = m.Flags
+	binary.BigEndian.PutUint32(data[4:8], m.Len)
+	copy(data[8:], m.SKI[:])
+	binary.BigEndian.PutUint32(data[28:32], m.ASNumber)
+	copy(data[32:], m.SPKI)
+	return data, nil
+}
+
 func SplitRTR(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 || len(data) < RTR_MIN_LEN {
 		return 0, nil, nil
@@ -384,6 +432,11 @@ func ParseRTR(data []byte) (RTRMessage, error) {
 		msg = &RTRCacheReset{}
 	case RTR_ERROR_REPORT:
 		msg = &RTRErrorReport{}
+	case RTR_ROUTER_KEY:
+		if data[0] == 0 {
+			return nil, fmt.Errorf("RTR Router Key message type %d is not supported in old protocol v0", data[1])
+		}
+		msg = &RTRRouterKey{}
 	default:
 		return nil, fmt.Errorf("unknown RTR message type %d", data[1])
 	}
